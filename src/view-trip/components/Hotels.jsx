@@ -7,21 +7,37 @@ const Hotels = ({ hotels }) => {
   // const hotels = trip?.tripData?.travelPlan?.hotels || trip?.tripData?.HotelOptions || [];
   // console.log("hotels", hotels);
   return (
-    <div>
-      <h2 className="font-bold text-xl mt-5">Hotel Recommendation</h2>
+    // <div>
+    //   <h2 className="font-bold text-xl mt-5">Hotel Recommendation</h2>
 
-      {hotels ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 mt-4">
-          {hotels.map((hotel, index) => (
-            <HotelCardItem hotel={hotel} key={index} />
-          ))}
-        </div>
-      ) : (
-        <p className="text-gray-500 mt-2">
-          No hotel recommendations available.
-        </p>
-      )}
+    //   {hotels ? (
+    //     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 mt-4">
+    //       {hotels.map((hotel, index) => (
+    //         <HotelCardItem hotel={hotel} key={index} />
+    //       ))}
+    //     </div>
+    //   ) : (
+    //     <p className="text-gray-500 mt-2">
+    //       No hotel recommendations available.
+    //     </p>
+    //   )}
+    // </div>
+    <div className="mt-10">
+  <h2 className="font-bold text-lg sm:text-xl">Hotel Recommendation</h2>
+
+  {hotels ? (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 mt-4">
+      {hotels.map((hotel, index) => (
+        <HotelCardItem hotel={hotel} key={index} />
+      ))}
     </div>
+  ) : (
+    <p className="text-gray-500 mt-2">
+      No hotel recommendations available.
+    </p>
+  )}
+</div>
+
   );
 };
 

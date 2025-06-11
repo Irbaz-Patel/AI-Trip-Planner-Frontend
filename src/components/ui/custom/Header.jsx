@@ -37,7 +37,6 @@ const Header = () => {
     setLoading(true); // Set loading to true immediately
 
     // Simulate an asynchronous operation (like a network request)
-    // In a real app, this would be your axios.post('/api/auth/login', { email, password })
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate 1 second delay
 
     // After the "async operation" (or delay) completes:

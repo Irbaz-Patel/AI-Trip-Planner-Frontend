@@ -37,9 +37,11 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
+  <>
     {/* <Header/>
     <Toaster /> */}
     <RouterProvider router={router} />
-  </StrictMode>
+  </>
+  // </StrictMode>
 );

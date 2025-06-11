@@ -21,16 +21,17 @@ const MyTrips = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/trips?userEmail=${userEmail}`
+        // `http://localhost:5000/api/trips?userEmail=${userEmail}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/trips?userEmail=${userEmail}`
       );
-      console.log("User Trips:", response.data.trips); // ✅ log all trips
+      // console.log("User Trips:", response.data.trips); // ✅ log all trips
       setUserTrips(response.data.trips);
     } catch (error) {
       console.error("Error fetching trips:", error);
     }
   };
   return (
-    <div className="px-5 sm:px-10 md:px-32 lg:px-56 xl:px-10 mt-24">
+    <div className="px-5 sm:px-10 md:px-32 lg:px-56 xl:px-10 mt-24 mb-10">
       <h2 className="font-bold text-3xl text-center sm:text-left">My Trips</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10">

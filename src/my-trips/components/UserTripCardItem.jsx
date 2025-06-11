@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const UserTripCardItem = ({ myTrip }) => {
-  console.log("myTrips", myTrip);
+  // console.log("myTrips", myTrip);
   const { budget, location, noOfDays, traveler } = myTrip?.userSelection;
   const [placePhotoUrl, setPlacePhotoUrl] = useState(null);
   const [loadingPhoto, setLoadingPhoto] = useState(true);
