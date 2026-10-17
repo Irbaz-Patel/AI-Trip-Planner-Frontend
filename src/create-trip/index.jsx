@@ -63,7 +63,8 @@ const CreateTrip = () => {
       const backendResponse = await axios.post(
         // https://ai-trip-planner-backend-3.onrender.com
         // `${import.meta.env.VITE_BACKEND_URL}/api/trips`,
-        `https://ai-trip-planner-backend-3.onrender.com/api/trips`,
+        // `https://ai-trip-planner-backend-3.onrender.com/api/trips`,
+        `https://ai-trip-planner-backend-2.onrender.com/api/trips`,
         {
           userEmail: userEmail, // Use the provided userEmail
           userSelection: formData,
@@ -81,7 +82,7 @@ const CreateTrip = () => {
       // router.push('/view-trip/' + backendResponse.data.trip._id);
       const tripId = backendResponse.data.trip._id;
       navigate("/view-trip/" + tripId); // <-- ADD THIS LINE FOR NAVIGATION
-       window.location.reload();
+      //  window.location.reload();
     } catch (error) {
       console.error("Error during trip generation or saving:", error);
       toast.error(

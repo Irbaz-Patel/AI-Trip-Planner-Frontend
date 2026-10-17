@@ -3,111 +3,95 @@ import { Button } from "../../components/ui/button";
 import { IoIosSend } from "react-icons/io";
 import { GetUnsplashPhoto } from "@/service/GlobalApi";
 
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&auto=format&fit=crop";
+
 const InfoSection = ({ trip }) => {
-  // console.log("InfoSection Trip data: ", trip)
-  //    const {
-  //     location,
-  //     destination,
-  //     duration,
-  //     budget,
-  //     travelers,
-  //     groupSize,
-  //     numberOfPeople
-  //   } = trip || {};
-  //   const place = location || destination || "Unknown Location";
-  // const group = travelers || groupSize || numberOfPeople ||  "N/A";
-  // console.log("Infosection Trip Data: ", trip)
   const { budget, location, noOfDays, traveler } = trip || {};
 
   const [placePhotoUrl, setPlacePhotoUrl] = useState(null);
   const [loadingPhoto, setLoadingPhoto] = useState(true);
-  const [photoError, setPhotoError] = useState(null);
 
   useEffect(() => {
-    if (location) {
-      getGenericPlacePhoto();
-    }
+    let cancelled = false;
+
+    const getPhoto = async () => {
+      if (!location) {
+        setLoadingPhoto(false);
+        return;
+      }
+
+      setLoadingPhoto(true);
+
+      try {
+        const photoUrl = await GetUnsplashPhoto(`${location} city`);
+
+        if (!cancelled) {
+          setPlacePhotoUrl(photoUrl || FALLBACK_IMAGE);
+        }
+      } catch (error) {
+        console.error("Error fetching location photo:", error);
+        if (!cancelled) {
+          setPlacePhotoUrl(FALLBACK_IMAGE);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingPhoto(false);
+        }
+      }
+    };
+
+    getPhoto();
+
+    return () => {
+      cancelled = true;
+    };
   }, [location]);
 
-  const getGenericPlacePhoto = async () => {
-    setLoadingPhoto(true);
-    setPhotoError(null);
-    try {
-      // Search for a generic photo of the location (e.g., "Paris city", "New York building")
-      const photoUrl = await GetUnsplashPhoto(`${location} city`); // Adjust query as needed
-      if (photoUrl) {
-        setPlacePhotoUrl(photoUrl);
-        // console.log(photoUrl)
-      } else {
-        console.warn("No generic photo found for this location on Unsplash.");
-        setPlacePhotoUrl(null);
-      }
-    } catch (error) {
-      console.error("Error fetching generic photo:", error.message);
-      setPhotoError("Failed to fetch a generic photo for the location.");
-      setPlacePhotoUrl(null);
-    } finally {
-      setLoadingPhoto(false);
-    }
-  };
-
   return (
-    // <div className="mt-16">
-    //   <img
-    //     // src='/images.jpg'
-    //     src={placePhotoUrl}
-    //     className="h-[340px] w-full object-cover rounded-xl"
-    //     alt=""
-    //   />
-
-    //   <div className="flex justify-between items-center">
-    //     <div className="my-5 flex flex-col gap-2">
-    //       <h2 className="font-bold text-2xl">{location}</h2>
-    //       <div className="flex gap-5">
-    //         <h2 className="p-1 px-3 bg-gray-200 rounded-full text-gray-500 text-xs md:text-md">
-    //           📅 {noOfDays}
-    //         </h2>
-    //         <h2 className="p-1 px-3 bg-gray-200 rounded-full text-gray-500 text-xs md:text-md">
-    //           💰 {budget}
-    //         </h2>
-    //         <h2 className="p-1 px-3 bg-gray-200 rounded-full text-gray-500 text-xs md:text-md">
-    //           🥂 No. Of Traveler: {traveler}
-    //         </h2>
-    //       </div>
-    //     </div>
-    //     <Button>
-    //       <IoIosSend />
-    //     </Button>
-    //   </div>
-    // </div>
     <div className="mt-10">
-  <img
-    src={placePhotoUrl}
-    className="h-52 sm:h-64 md:h-[340px] w-full object-cover rounded-xl"
-    alt=""
-  />
+      <img
+        src={placePhotoUrl || FALLBACK_IMAGE}
+        onError={(event) => {
+          event.currentTarget.onerror = null;
+          event.currentTarget.src = FALLBACK_IMAGE;
+        }}
+        className="h-52 sm:h-64 md:h-[340px] w-full object-cover rounded-xl"
+        alt={`${location || "Travel destination"} landscape`}
+      />
 
-  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 mt-5">
-    <div className="flex flex-col gap-2">
-      <h2 className="font-bold text-xl sm:text-2xl">{location}</h2>
-      <div className="flex flex-wrap gap-3">
-        <h2 className="p-1 px-3 bg-gray-200 rounded-full text-gray-600 text-xs sm:text-sm md:text-md">
-          📅 {noOfDays}
-        </h2>
-        <h2 className="p-1 px-3 bg-gray-200 rounded-full text-gray-600 text-xs sm:text-sm md:text-md">
-          💰 {budget}
-        </h2>
-        <h2 className="p-1 px-3 bg-gray-200 rounded-full text-gray-600 text-xs sm:text-sm md:text-md">
-          🥂 No. Of Traveler: {traveler}
-        </h2>
+      {loadingPhoto && (
+        <p className="mt-2 text-sm text-gray-500">
+          Loading destination photo...
+        </p>
+      )}
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 mt-5">
+        <div className="flex flex-col gap-2">
+          <h2 className="font-bold text-xl sm:text-2xl">
+            {location || "Unknown location"}
+          </h2>
+
+          <div className="flex flex-wrap gap-3">
+            <span className="p-1 px-3 bg-gray-200 rounded-full text-gray-600 text-xs sm:text-sm">
+              📅 {noOfDays} days
+            </span>
+
+            <span className="p-1 px-3 bg-gray-200 rounded-full text-gray-600 text-xs sm:text-sm">
+              💰 {budget}
+            </span>
+
+            <span className="p-1 px-3 bg-gray-200 rounded-full text-gray-600 text-xs sm:text-sm">
+              🥂 Travelers: {traveler}
+            </span>
+          </div>
+        </div>
+
+        <Button>
+          <IoIosSend />
+        </Button>
       </div>
     </div>
-    <Button>
-      <IoIosSend />
-    </Button>
-  </div>
-</div>
-
   );
 };
 

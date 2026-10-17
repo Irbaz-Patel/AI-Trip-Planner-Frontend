@@ -1,56 +1,67 @@
-import { GetUnsplashPhoto } from "@/service/GlobalApi";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { GetUnsplashPhoto } from "@/service/GlobalApi";
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&auto=format&fit=crop";
 
 const UserTripCardItem = ({ myTrip }) => {
-  // console.log("myTrips", myTrip);
-  const { budget, location, noOfDays, traveler } = myTrip?.userSelection;
+  console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
+  const selection = myTrip?.userSelection || {};
+
+  const { budget, location, noOfDays } = selection;
+
   const [placePhotoUrl, setPlacePhotoUrl] = useState(null);
-  const [loadingPhoto, setLoadingPhoto] = useState(true);
-  const [photoError, setPhotoError] = useState(null);
 
   useEffect(() => {
-    if (location) {
-      getGenericPlacePhoto();
-    }
-  }, [location]);
+    let cancelled = false;
 
-  const getGenericPlacePhoto = async () => {
-    setLoadingPhoto(true);
-    setPhotoError(null);
-    try {
-      const photoUrl = await GetUnsplashPhoto(`${location} city`);
-      if (photoUrl) {
-        setPlacePhotoUrl(photoUrl);
-      } else {
-        console.warn("No generic photo found for this location on Unsplash.");
-        setPlacePhotoUrl(null);
+    const getPhoto = async () => {
+      if (!location) return;
+
+      try {
+        const photoUrl = await GetUnsplashPhoto(`${location} city`);
+
+        if (!cancelled) {
+          setPlacePhotoUrl(photoUrl || FALLBACK_IMAGE);
+        }
+      } catch (error) {
+        console.error("Error fetching trip photo:", error.message);
+
+        if (!cancelled) {
+          setPlacePhotoUrl(FALLBACK_IMAGE);
+        }
       }
-    } catch (error) {
-      console.error("Error fetching generic photo:", error.message);
-      setPhotoError("Failed to fetch a generic photo for the location.");
-      setPlacePhotoUrl(null);
-    } finally {
-      setLoadingPhoto(false);
-    }
-  };
+    };
+
+    getPhoto();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [location]);
 
   return (
     <Link to={`/view-trip/${myTrip?._id}`}>
-      <div className="hover:scale-[1.03] hover:shadow-2xl transition-all duration-300 bg-white rounded-xl overflow-hidden border border-gray-200 flex flex-col h-full">
+      <div className="h-full overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl">
         <img
-          src={
-            placePhotoUrl ||
-            "https://via.placeholder.com/300x220?text=Image+Not+Found"
-          }
-          alt={location}
-          className="object-cover w-full h-[220px]"
+          src={placePhotoUrl || FALLBACK_IMAGE}
+          alt={location || "Travel destination"}
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = FALLBACK_IMAGE;
+          }}
+          className="h-[220px] w-full object-cover"
         />
-        <div className="p-4 space-y-1 flex-1 flex flex-col justify-between">
-          <h2 className="font-bold text-sm text-gray-800">{location}</h2>
-          <h2 className="text-sm text-gray-500">
-            {noOfDays} days trip with {budget} budget
+
+        <div className="flex flex-col justify-between space-y-1 p-4">
+          <h2 className="text-sm font-bold text-gray-800">
+            {location || "Unknown destination"}
           </h2>
+
+          <p className="text-sm text-gray-500">
+            {noOfDays ?? "N/A"} days trip with {budget || "N/A"} budget
+          </p>
         </div>
       </div>
     </Link>
