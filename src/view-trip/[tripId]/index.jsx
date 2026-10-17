@@ -20,7 +20,7 @@ const ViewTrip = () => {
         // Use tripId in the API call
         const response = await axios.get(
           // `http://localhost:5000/api/trips/${tripId}`
-          `https://ai-trip-planner-backend-3.onrender.com/api/trips/${tripId}`
+          `https://ai-trip-planner-backend-2.onrender.com/api/trips/${tripId}`
         );
 
         let parsedTripData = response.data.trip.tripData;
